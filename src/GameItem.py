@@ -17,6 +17,7 @@ class GameItem(GameObject):
         self,
         collidable: bool,
         consumable: bool,
+        winner: bool,
         on_collide: Optional[Callable[[TypeVar("GameItem"), Any], Any]] = None,
         on_consume: Optional[Callable[[TypeVar("GameItem"), Any], Any]] = None,
         *args,
@@ -27,7 +28,8 @@ class GameItem(GameObject):
         self.consumable = consumable
         self._on_collide = on_collide
         self._on_consume = on_consume
-        self.in_play = True
+        self.in_play = not winner
+        self.is_winner = winner
 
     def respawn(self, x: Optional[float] = None, y: Optional[float] = None) -> None:
         if x is not None:

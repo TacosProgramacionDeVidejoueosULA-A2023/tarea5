@@ -44,6 +44,7 @@ class GameEntity(mixins.DrawableMixin, mixins.AnimatedMixin, mixins.CollidableMi
         self.generate_animations(animation_defs)
         self.flipped = False
         self.is_dead = False
+        self.next_level_enabled = False
 
     def change_state(
         self, state_id: str, *args: Tuple[Any], **kwargs: Dict[str, Any]
@@ -80,6 +81,22 @@ class GameEntity(mixins.DrawableMixin, mixins.AnimatedMixin, mixins.CollidableMi
             return True
 
         return False
+    
+    def handle_tilemap_collision_with_goal(self) -> None:
+        collision_rect = self.get_collision_rect()
+
+        # Row for the center of the player
+        i = self.tilemap.to_i(collision_rect.centery)
+
+        # Left and right columns
+        left = self.tilemap.to_j(collision_rect.left)
+        right = self.tilemap.to_j(collision_rect.right)
+        if self.tilemap.check_goal_collision(
+            i - 1, left, self, GameObject.BOTTOM
+        ) or self.tilemap.check_goal_collision(i - 1, right, self, GameObject.BOTTOM):
+            # Fix the entity position
+            self.y = self.tilemap.to_y(i)
+            self.next_level_enabled = True
 
     def handle_tilemap_collision_on_bottom(self) -> bool:
         collision_rect = self.get_collision_rect()

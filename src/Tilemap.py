@@ -13,6 +13,7 @@ import pygame
 
 from src import mixins
 from src.Tile import Tile
+from src.Box import Box
 from src.definitions import tiles
 
 
@@ -27,6 +28,7 @@ class Tilemap:
         self.height = self.rows * self.tileheight
         self.render_rows_range = (0, self.rows)
         self.render_cols_range = (0, self.cols)
+        self.box_pos = (None, None, None)
 
     def create_layer(self) -> None:
         layer = [[None for _ in range(self.cols)] for _ in range(self.rows)]
@@ -40,9 +42,15 @@ class Tilemap:
         solidness = (
             tile_def["solidness"] if tile_def is not None else Tile.DEFAULT_SOLIDNESS
         )
-        self.layers[-1][i][j] = Tile(
-            i, j, self.tilewidth, self.tileheight, frame_index, solidness
-        )
+        if frame_index != 50:
+            self.layers[-1][i][j] = Tile(
+                i, j, self.tilewidth, self.tileheight, frame_index, solidness
+            )
+        else:
+            self.box_pos = (-1, i, j)
+            self.layers[-1][i][j] = Box(
+                i, j, self.tilewidth, self.tileheight, frame_index, solidness
+            )
 
     def set_render_boundaries(self, render_rect: pygame.Rect) -> None:
         self.render_rows_range = (
@@ -83,9 +91,22 @@ class Tilemap:
     ) -> bool:
         if 0 <= i < self.rows and 0 <= j < self.cols:
             for layer in self.layers:
+                if layer[i][j].frame_index == 50:
+                    self.box_pos = (-1, i, j)
+
                 if layer[i][j].collides_on(another, side):
                     return True
         return False
+    
+    def check_goal_collision(self, i: int, j: int, another: mixins.CollidableMixin, side: str) -> bool:
+        if (self.box_pos[0] is not None):
+            layer = self.box_pos[0]
+            i_goal = self.box_pos[1]
+            j_goal = self.box_pos[2]
+            if(self.layers[layer][i_goal][j_goal] == self.layers[layer][i][j]):
+                return True
+            
+            return False
 
     def check_solidness_on(self, i: int, j: int, side: str) -> bool:
         """

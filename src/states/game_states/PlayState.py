@@ -20,6 +20,7 @@ import settings
 from src.Camera import Camera
 from src.GameLevel import GameLevel
 from src.Player import Player
+from src.Box import Box
 
 
 class PlayState(BaseState):
@@ -91,12 +92,30 @@ class PlayState(BaseState):
                 self.player.change_state("dead")
 
         for item in self.game_level.items:
+            if item.is_winner and self.player.score > 100 and self.player.next_level_enabled:
+                    item.in_play = True
+                    
             if not item.in_play or not item.collidable:
                 continue
 
             if self.player.collides(item):
                 item.on_collide(self.player)
                 item.on_consume(self.player)
+
+        if self.player.won:
+            if self.player.won and self.level == 2:
+                self.state_machine.change("game_over", self.player)
+                return
+            
+            pygame.mixer.music.stop()
+            pygame.mixer.music.unload()
+            self.state_machine.change(
+                "victory", 
+                level=self.level,
+                camera=self.camera,
+                game_level=self.game_level,
+                player=self.player,
+            )
 
     def render(self, surface: pygame.Surface) -> None:
         world_surface = pygame.Surface((self.tilemap.width, self.tilemap.height))

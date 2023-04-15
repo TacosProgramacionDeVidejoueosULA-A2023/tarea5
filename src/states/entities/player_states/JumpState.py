@@ -35,6 +35,8 @@ class JumpState(BaseEntityState):
         if self.entity.vy >= 0:
             self.entity.change_state("fall")
 
+        self.entity.handle_tilemap_collision_with_goal()
+
     def on_input(self, input_id: str, input_data: InputData) -> None:
         if input_id == "move_left":
             if input_data.pressed:

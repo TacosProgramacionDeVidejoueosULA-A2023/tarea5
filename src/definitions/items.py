@@ -23,9 +23,12 @@ def pickup_coin(
 ) -> None:
     settings.SOUNDS["pickup_coin"].stop()
     settings.SOUNDS["pickup_coin"].play()
-    player.score += points
-    player.coins_counter[color] += 1
-    Timer.after(time, lambda: coin.respawn())
+    if points == 1000000:
+        player.won = True
+    else:
+        player.score += points
+        player.coins_counter[color] += 1
+        Timer.after(time, lambda: coin.respawn())
 
 
 def pickup_green_coin(coin: GameItem, player: Player):
@@ -43,6 +46,9 @@ def pickup_red_coin(coin: GameItem, player: Player):
 def pickup_yellow_coin(coin: GameItem, player: Player):
     pickup_coin(coin, player, 50, 54, random.uniform(20, 25))
 
+def pickup_key(coin: GameItem, player: Player):
+    pickup_coin(coin, player, 1000000, 68, random.uniform(20, 25))   
+
 
 ITEMS: Dict[str, Dict[int, Dict[str, Any]]] = {
     "coins": {
@@ -51,6 +57,7 @@ ITEMS: Dict[str, Dict[int, Dict[str, Any]]] = {
             "solidness": dict(top=False, right=False, bottom=False, left=False),
             "consumable": True,
             "collidable": True,
+            "winner": False,
             "on_consume": pickup_green_coin,
         },
         61: {
@@ -58,6 +65,7 @@ ITEMS: Dict[str, Dict[int, Dict[str, Any]]] = {
             "solidness": dict(top=False, right=False, bottom=False, left=False),
             "consumable": True,
             "collidable": True,
+            "winner": False,
             "on_consume": pickup_blue_coin,
         },
         55: {
@@ -65,6 +73,7 @@ ITEMS: Dict[str, Dict[int, Dict[str, Any]]] = {
             "solidness": dict(top=False, right=False, bottom=False, left=False),
             "consumable": True,
             "collidable": True,
+            "winner": False,
             "on_consume": pickup_red_coin,
         },
         54: {
@@ -72,7 +81,16 @@ ITEMS: Dict[str, Dict[int, Dict[str, Any]]] = {
             "solidness": dict(top=False, right=False, bottom=False, left=False),
             "consumable": True,
             "collidable": True,
+            "winner": False,
             "on_consume": pickup_yellow_coin,
+        },
+        68: {
+            "texture_id": "tiles",
+            "solidness": dict(top=False, right=False, bottom=False, left=False),
+            "consumable": True,
+            "collidable": True,
+            "winner": True,
+            "on_consume": pickup_key,
         },
     }
 }

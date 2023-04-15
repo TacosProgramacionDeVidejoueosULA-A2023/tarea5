@@ -41,7 +41,7 @@ PLAYER_SPEED = 80
 
 GRAVITY = 980
 
-NUM_LEVELS = 1
+NUM_LEVELS = 2
 
 BASE_DIR = pathlib.Path(__file__).parent
 
@@ -68,6 +68,7 @@ SOUNDS = {
     "jump": pygame.mixer.Sound(BASE_DIR / "sounds" / "jump.wav"),
     "timer": pygame.mixer.Sound(BASE_DIR / "sounds" / "timer.wav"),
     "count": pygame.mixer.Sound(BASE_DIR / "sounds" / "count.wav"),
+    "level_complete": pygame.mixer.Sound(BASE_DIR / "sounds" / "level_complete.wav"),
 }
 
 SOUNDS["pickup_coin"].set_volume(0.5)
