@@ -20,7 +20,6 @@ import settings
 from src.Camera import Camera
 from src.GameLevel import GameLevel
 from src.Player import Player
-from src.Box import Box
 
 
 class PlayState(BaseState):
@@ -38,16 +37,23 @@ class PlayState(BaseState):
         self.tilemap = self.game_level.tilemap
         self.player = enter_params.get("player")
         if self.player is None:
-            self.player = Player(0, settings.VIRTUAL_HEIGHT - 66, self.game_level)
+            self.player = Player(0, settings.VIRTUAL_HEIGHT - 66, self.game_level, self.level)
             self.player.change_state("idle")
 
         self.timer = enter_params.get("timer", 30)
 
         def countdown_timer():
-            self.timer -= 1
+            if self.player.score < 200 and self.player.level == 1:
+                self.timer -= 1
 
-            if 0 < self.timer <= 5:
-                settings.SOUNDS["timer"].play()
+                if 0 < self.timer <= 5:
+                    settings.SOUNDS["timer"].play()
+
+            if self.player.level == 2:
+                self.timer -= 1
+
+                if 0 < self.timer <= 5:
+                    settings.SOUNDS["timer"].play()
 
             if self.timer == 0:
                 self.player.change_state("dead")
@@ -57,6 +63,11 @@ class PlayState(BaseState):
 
     def exit(self) -> None:
         InputHandler.unregister_listener(self)
+        Timer.clear()
+
+    def allow_to_grab_key(self):
+        self.player.allow_to_grab_key = True
+        self.winner_item.y = self.key_y_end
         Timer.clear()
 
     def update(self, dt: float) -> None:
@@ -92,8 +103,18 @@ class PlayState(BaseState):
                 self.player.change_state("dead")
 
         for item in self.game_level.items:
-            if item.is_winner and self.player.score > 100 and self.player.next_level_enabled:
-                    item.in_play = True
+            if item.is_winner and self.player.score >= 200 and self.player.next_level_enabled:
+                    if not self.player.allow_to_grab_key:
+                        self.winner_item = item
+                        self.key_y_end = item.y - 16
+                        Timer.tween(
+                            0.1,
+                            [
+                                (item, {"y": self.key_y_end}),
+                            ],
+                            on_finish=self.allow_to_grab_key,
+                        )
+                        item.in_play = True
                     
             if not item.in_play or not item.collidable:
                 continue

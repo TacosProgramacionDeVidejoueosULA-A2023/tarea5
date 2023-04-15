@@ -14,7 +14,7 @@ from src.states.entities import player_states
 
 
 class Player(GameEntity):
-    def __init__(self, x: int, y: int, game_level: TypeVar("GameLevel")) -> None:
+    def __init__(self, x: int, y: int, game_level: TypeVar("GameLevel"), level) -> None:
         super().__init__(
             x,
             y,
@@ -37,4 +37,7 @@ class Player(GameEntity):
         )
         self.score = 0
         self.won = False
+        self.allow_to_grab_key = False
+        self.alarm_went_off = False
+        self.level = level
         self.coins_counter = {54: 0, 55: 0, 61: 0, 62: 0}

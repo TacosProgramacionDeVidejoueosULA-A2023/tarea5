@@ -69,6 +69,7 @@ SOUNDS = {
     "timer": pygame.mixer.Sound(BASE_DIR / "sounds" / "timer.wav"),
     "count": pygame.mixer.Sound(BASE_DIR / "sounds" / "count.wav"),
     "level_complete": pygame.mixer.Sound(BASE_DIR / "sounds" / "level_complete.wav"),
+    "levelup": pygame.mixer.Sound(BASE_DIR / "sounds" / "levelup.wav"),
 }
 
 SOUNDS["pickup_coin"].set_volume(0.5)

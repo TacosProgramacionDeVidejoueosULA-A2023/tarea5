@@ -15,6 +15,7 @@ class VictoryState(BaseState):
         self.camera=enter_params["camera"]
         self.game_level=enter_params["game_level"]
         self.player=enter_params["player"]
+        self.player.alarm_went_off = False
         InputHandler.register_listener(self)
 
     def exit(self) -> None:

@@ -21,14 +21,28 @@ from src.Player import Player
 def pickup_coin(
     coin: GameItem, player: Player, points: int, color: int, time: float
 ) -> None:
-    settings.SOUNDS["pickup_coin"].stop()
-    settings.SOUNDS["pickup_coin"].play()
     if points == 1000000:
-        player.won = True
+        if player.allow_to_grab_key:
+            player.won = True
     else:
-        player.score += points
-        player.coins_counter[color] += 1
-        Timer.after(time, lambda: coin.respawn())
+        if player.score < 200 and player.level == 1 and not player.alarm_went_off:
+            settings.SOUNDS["pickup_coin"].stop()
+            settings.SOUNDS["pickup_coin"].play()
+            player.score += points
+            player.coins_counter[color] += 1
+            Timer.after(time, lambda: coin.respawn())
+        
+        if player.level == 2:
+            settings.SOUNDS["pickup_coin"].stop()
+            settings.SOUNDS["pickup_coin"].play()
+            player.score += points
+            player.coins_counter[color] += 1
+            Timer.after(time, lambda: coin.respawn())
+
+    if player.score >= 200 and player.level == 1 and not player.alarm_went_off:
+         player.alarm_went_off = True
+         settings.SOUNDS["levelup"].stop()
+         settings.SOUNDS["levelup"].play()
 
 
 def pickup_green_coin(coin: GameItem, player: Player):
